@@ -26,6 +26,18 @@ window.TOUR_CONFIG = {
       ]
     },
     {
+      id: 'deluxe-suite',
+      label: 'Deluxe Suite',
+      scenes: [
+        '45-delux-suite-overview',
+        '46-delux-suite-2-overview',
+        '47-delux-suite-living',
+        '48-delux-suite-sleeping',
+        '49-delux-suite-terrace-view',
+        '50-delux-suite-bathroom'
+      ]
+    },
+    {
       id: 'dependance',
       label: 'Dependance',
       scenes: [
@@ -95,18 +107,6 @@ window.TOUR_CONFIG = {
         '42-dependace-cristal-pool',
         '43-dependance-pool-jacuzzi',
         '44-dependance-pool-waterblade'
-      ]
-    },
-    {
-      id: 'deluxe-suite',
-      label: 'Deluxe Suite',
-      scenes: [
-        '45-delux-suite-overview',
-        '46-delux-suite-2-overview',
-        '47-delux-suite-living',
-        '48-delux-suite-sleeping',
-        '49-delux-suite-terrace-view',
-        '50-delux-suite-bathroom'
       ]
     }
   ],
