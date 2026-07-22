@@ -1773,7 +1773,7 @@ var APP_DATA = {
   "name": "Hotel Italia Palace",
   "settings": {
     "mouseViewMode": "drag",
-    "autorotateEnabled": true,
+    "autorotateEnabled": false,
     "fullscreenButton": false,
     "viewControlButtons": false
   }
