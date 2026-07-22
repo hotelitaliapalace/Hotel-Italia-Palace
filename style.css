@@ -40,6 +40,11 @@ button {
   touch-action: manipulation;
 }
 
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
 button:focus-visible,
 summary:focus-visible,
 .skip-link:focus-visible {
@@ -127,6 +132,93 @@ summary:focus-visible,
   letter-spacing: 0.16em;
   line-height: 1.3;
   text-transform: uppercase;
+}
+
+.related-tours {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  padding: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.tour-switch-link {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  min-height: 58px;
+  padding: 9px 27px 9px 10px;
+  overflow: hidden;
+  border: 1px solid rgba(215, 183, 120, 0.28);
+  border-radius: 11px;
+  background: rgba(215, 183, 120, 0.09);
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.tour-switch-link:hover,
+.tour-switch-link:focus-visible {
+  border-color: rgba(215, 183, 120, 0.7);
+  background: rgba(215, 183, 120, 0.18);
+}
+
+.tour-switch-link:active {
+  transform: scale(0.98);
+}
+
+.tour-switch-link span,
+.tour-switch-link strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tour-switch-link span {
+  margin-bottom: 3px;
+  color: var(--muted);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tour-switch-link strong {
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.tour-switch-link i {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  width: 13px;
+  height: 8px;
+  color: var(--accent);
+  transform: translateY(-50%);
+}
+
+.tour-switch-link i::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  right: 0;
+  width: 12px;
+  height: 1px;
+  background: currentColor;
+}
+
+.tour-switch-link i::after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  right: 0;
+  width: 5px;
+  height: 5px;
+  border-top: 1px solid currentColor;
+  border-right: 1px solid currentColor;
+  transform: rotate(45deg);
 }
 
 .group-navigation {
@@ -737,6 +829,23 @@ summary:focus-visible,
     overflow-y: auto;
     padding: 6px 0;
     overscroll-behavior: contain;
+  }
+
+  .mobile-related-tours {
+    flex: 0 0 auto;
+    padding: 10px 0;
+  }
+
+  .mobile-related-tours .tour-switch-link {
+    min-height: 60px;
+  }
+
+  .mobile-related-tours .tour-switch-link span {
+    font-size: 8px;
+  }
+
+  .mobile-related-tours .tour-switch-link strong {
+    font-size: 13px;
   }
 
   .mobile-navigation .navigation-group summary {

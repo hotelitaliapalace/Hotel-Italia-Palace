@@ -45,9 +45,7 @@ window.TOUR_CONFIG = {
         '10-dependance-sundeck',
         '11-dependance-rooftop-view',
         '12-dependance-glass-pool',
-        '13-dependance-entrance',
-        '14-hallway',
-        '15-hotel-stairs'
+        '13-dependance-entrance'
       ]
     },
     {

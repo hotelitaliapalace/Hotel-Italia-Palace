@@ -6,10 +6,20 @@ The canonical GitHub Pages application is served from the repository root.
 The legacy `app-files/` export is retained unchanged for rollback and archive
 purposes; it must not be edited in parallel with the root application.
 
+Three visitor-facing routes share the same application and panorama tiles:
+
+- complete tour: `/Hotel-Italia-Palace/`
+- Hotel: `/Hotel-Italia-Palace/?tour=hotel`
+- Dependance: `/Hotel-Italia-Palace/?tour=dependance`
+
+`Hallway` and `Hotel stairs` remain archived in `data.js` and `tiles/`, but are
+intentionally excluded from every visitor-facing route.
+
 ## Safety and rollback
 
-- Baseline branch: `backup/pre-mobile-tour-navigation-20260722`
-- Working branch: `agent/mobile-tour-navigation`
+- Initial navigation baseline: `backup/pre-mobile-tour-navigation-20260722`
+- Pre-split baseline: `backup/pre-split-tours-20260722`
+- Current split-tour branch: `agent/split-hotel-dependance-tours`
 - Production branch: `main`
 - The production site changes only after the pull request is reviewed and
   merged.
@@ -23,6 +33,8 @@ purposes; it must not be edited in parallel with the root application.
 - Previous and next controls always display both the destination group and
   scene name.
 - The complete route is defined in `tour-config.js`.
+- Hotel and Dependance membership is defined in `tour-variants.js`.
+- Every variant displays links to the companion tour and the complete tour.
 - Corrected labels are display-only. Original scene IDs stay unchanged so tile
   URLs remain compatible.
 - The current scene is stored in the URL as `#scene=<scene-id>` and can be
@@ -35,8 +47,10 @@ purposes; it must not be edited in parallel with the root application.
 3. Update `names` to change visitor-facing labels.
 4. Do not rename scene IDs unless the corresponding directory inside `tiles/`
    is renamed at the same time.
-5. Keep every scene ID in exactly one group. Unmapped scenes are placed in an
-   automatic `Other areas` group as a safe fallback.
+5. Open `tour-variants.js` to change which groups or individual scenes appear
+   in Hotel and Dependance.
+6. Unmapped scenes are excluded by default; this prevents archived scenes from
+   reappearing accidentally.
 
 ## Spatial doorway hotspots
 
@@ -49,8 +63,13 @@ curated tour sequence instead.
 
 - `node --check index.js`
 - `node --check tour-config.js`
+- `node --check tour-variants.js`
 - `git diff --check`
-- Confirm all 51 scenes appear once in `tour-config.js`.
+- Confirm complete tour: 49 scenes.
+- Confirm Hotel: 24 scenes.
+- Confirm Dependance: 25 scenes.
+- Confirm `14-hallway` and `15-hotel-stairs` appear in no menu.
+- Confirm the Hotel and Dependance links open each other.
 - Confirm desktop at widths 1024, 1280 and 1440 pixels.
 - Confirm mobile at widths 320, 375 and 430 pixels.
 - Confirm portrait and landscape orientation.
