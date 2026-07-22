@@ -8,6 +8,7 @@
   var Marzipano = window.Marzipano;
   var data = window.APP_DATA;
   var config = window.TOUR_CONFIG;
+  var variants = window.TOUR_VARIANTS || {};
 
   if (!Marzipano || !data || !config) {
     throw new Error('The tour could not start because a required resource is missing.');
@@ -15,6 +16,10 @@
 
   var elements = {
     pano: document.querySelector('#pano'),
+    desktopTourTitle: document.querySelector('#desktopTourTitle'),
+    mobileTourTitle: document.querySelector('#mobileTourTitle'),
+    desktopRelatedTours: document.querySelector('#desktopRelatedTours'),
+    mobileRelatedTours: document.querySelector('#mobileRelatedTours'),
     desktopNavigation: document.querySelector('#tourNavigation'),
     mobileNavigation: document.querySelector('#mobileNavigation'),
     currentGroup: document.querySelector('#currentGroup'),
@@ -37,7 +42,8 @@
     sceneDataById[sceneData.id] = sceneData;
   });
 
-  var groups = normalizeGroups(config.groups);
+  var activeVariant = selectVariant();
+  var groups = normalizeGroups(resolveVariantGroups(activeVariant.groups));
   var route = [];
   var groupBySceneId = Object.create(null);
   groups.forEach(function(group) {
@@ -52,7 +58,9 @@
   });
 
   var sceneById = Object.create(null);
-  data.scenes.forEach(function(sceneData) {
+  data.scenes.filter(function(sceneData) {
+    return Boolean(groupBySceneId[sceneData.id]);
+  }).forEach(function(sceneData) {
     var source = Marzipano.ImageUrlSource.fromString(
       'tiles/' + sceneData.id + '/{z}/{f}/{y}/{x}.jpg',
       { cubeMapPreviewUrl: 'tiles/' + sceneData.id + '/preview.jpg' }
@@ -99,6 +107,11 @@
   var currentSceneId = null;
   var sheetCloseTimer = null;
 
+  elements.desktopTourTitle.textContent = activeVariant.title;
+  elements.mobileTourTitle.textContent = activeVariant.title + ' · Virtual Tour';
+  document.documentElement.dataset.tour = activeVariant.id;
+  buildRelatedTours(elements.desktopRelatedTours);
+  buildRelatedTours(elements.mobileRelatedTours);
   buildNavigation(elements.desktopNavigation, false);
   buildNavigation(elements.mobileNavigation, true);
   bindControls();
@@ -108,6 +121,34 @@
     initialSceneId = route[0];
   }
   switchScene(initialSceneId, { replaceHistory: true, immediate: true });
+
+  function selectVariant() {
+    var match = window.location.search.match(/[?&]tour=([^&]+)/);
+    var requestedId = match ? decodeURIComponent(match[1]) : 'all';
+    return variants[requestedId] || variants.all || {
+      id: 'all',
+      title: 'Virtual Tour',
+      groups: null,
+      relatedTours: []
+    };
+  }
+
+  function resolveVariantGroups(groupDefinitions) {
+    if (!Array.isArray(groupDefinitions)) {
+      return config.groups;
+    }
+    return groupDefinitions.map(function(definition) {
+      if (typeof definition !== 'string') {
+        return definition;
+      }
+      for (var i = 0; i < config.groups.length; i++) {
+        if (config.groups[i].id === definition) {
+          return config.groups[i];
+        }
+      }
+      return null;
+    }).filter(Boolean);
+  }
 
   function normalizeGroups(rawGroups) {
     var known = Object.create(null);
@@ -124,15 +165,43 @@
       return group.scenes.length > 0;
     });
 
-    var ungrouped = data.scenes.filter(function(sceneData) {
-      return !known[sceneData.id];
-    }).map(function(sceneData) {
-      return sceneData.id;
-    });
-    if (ungrouped.length) {
-      normalized.push({ id: 'other-areas', label: 'Other areas', scenes: ungrouped });
+    if (activeVariant.includeUngrouped) {
+      var ungrouped = data.scenes.filter(function(sceneData) {
+        return !known[sceneData.id];
+      }).map(function(sceneData) {
+        return sceneData.id;
+      });
+      if (ungrouped.length) {
+        normalized.push({ id: 'other-areas', label: 'Other areas', scenes: ungrouped });
+      }
     }
     return normalized;
+  }
+
+  function buildRelatedTours(container) {
+    var relatedTours = activeVariant.relatedTours || [];
+    if (!relatedTours.length) {
+      container.hidden = true;
+      return;
+    }
+
+    relatedTours.forEach(function(tour) {
+      var link = document.createElement('a');
+      link.className = 'tour-switch-link';
+      link.href = tour.href;
+      link.setAttribute('aria-label', 'Open ' + tour.label + ' virtual tour');
+
+      var caption = document.createElement('span');
+      caption.textContent = 'Open tour';
+      var label = document.createElement('strong');
+      label.textContent = tour.label;
+      var arrow = document.createElement('i');
+      arrow.setAttribute('aria-hidden', 'true');
+      link.appendChild(caption);
+      link.appendChild(label);
+      link.appendChild(arrow);
+      container.appendChild(link);
+    });
   }
 
   function buildNavigation(container, mobile) {
@@ -250,7 +319,7 @@
     var group = groupBySceneId[currentSceneId];
     elements.currentGroup.textContent = group.label;
     elements.currentScene.textContent = sceneName(currentSceneId);
-    document.title = sceneName(currentSceneId) + ' · Hotel Italia Palace';
+    document.title = sceneName(currentSceneId) + ' · ' + activeVariant.title + ' · Hotel Italia Palace';
 
     document.querySelectorAll('[data-scene-id]').forEach(function(button) {
       var active = button.dataset.sceneId === currentSceneId;
